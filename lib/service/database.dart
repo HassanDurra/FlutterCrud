@@ -8,4 +8,10 @@ class DatabaseMethods {
         .doc(id)
         .set(productDetails);
   }
+
+  Future<Stream<QuerySnapshot>> getProductDetails() async {
+    return FirebaseFirestore.instance
+        .collection('ProductsDetails') // corrected collection name
+        .snapshots();
+  }
 }

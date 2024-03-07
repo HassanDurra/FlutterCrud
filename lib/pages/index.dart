@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crudapplication/pages/create.dart';
+import 'package:crudapplication/service/database.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -9,12 +11,106 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Stream? orderStream;
+  getontheload() async {
+    orderStream = await DatabaseMethods().getProductDetails();
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getontheload();
+    super.initState();
+  }
+
+  Widget allProductDetails() {
+    return StreamBuilder(
+        stream: orderStream,
+        builder: (context, AsyncSnapshot snapshots) {
+          return snapshots.hasData
+              ? ListView.builder(
+                  itemCount: snapshots.data.docs.length,
+                  itemBuilder: (context, index) {
+                    DocumentSnapshot ds = snapshots.data.docs[index];
+
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 20),
+                      child: Material(
+                        elevation: 5.0,
+                        child: Container(
+                          padding: EdgeInsets.all(20),
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Street : " + ds['Street'],
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Area : " + ds['Area'],
+                                style: TextStyle(
+                                    color: Colors.orange,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Block : " + ds['Block'],
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "City : " + ds['City'],
+                                style: TextStyle(
+                                    color: Colors.orange,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Price: " + ds['Price'],
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  })
+              : Container();
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context,MaterialPageRoute(builder: (context)=>AddProduct()));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => AddProduct()));
         },
         child: Icon(Icons.add),
       ),
@@ -42,8 +138,9 @@ class _HomeState extends State<Home> {
         ),
       ),
       body: Container(
+        margin: EdgeInsets.only(left: 20, right: 20, top: 30),
         child: Column(
-          children: [],
+          children: [Expanded(child: allProductDetails())],
         ),
       ),
     );
